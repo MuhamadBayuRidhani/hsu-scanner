@@ -529,18 +529,46 @@
 
                 <!-- Parameter Inspection Badges — 7 Kategori Standar Keamanan -->
                 <div class="mt-8 pt-6 border-t border-slate-200">
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 text-center sm:text-left">
-                        Cakupan Parameter Audit Keamanan:
-                    </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 text-center sm:text-left">
+                            Cakupan Parameter Audit & Bobot Penalti:
+                        </p>
+                        <button type="button" onclick="toggleMethodologyCard()" class="inline-flex items-center justify-center space-x-1.5 text-xs font-bold text-gov-700 hover:text-gov-900 bg-gov-50 hover:bg-gov-100 border border-gov-200 px-3 py-1 rounded-lg transition-colors">
+                            <svg class="w-3.5 h-3.5 text-gov-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span>Lihat Tabel Metodologi & Rujukan OWASP</span>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         
+                        <div class="flex items-center space-x-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                            <div class="w-7 h-7 rounded-md bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-bold text-slate-800 truncate">SSL/TLS &amp; Redirect HTTPS</p>
+                                <p class="text-[10px] text-slate-500 truncate">Validitas CA (-10), TLS (-8), Redirect (-5)</p>
+                            </div>
+                        </div>
+
                         <div class="flex items-center space-x-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-200">
                             <div class="w-7 h-7 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[11px] font-bold text-slate-800 truncate">Security Headers</p>
-                                <p class="text-[10px] text-slate-500 truncate">CSP, HSTS, X-Frame</p>
+                                <p class="text-[11px] font-bold text-slate-800 truncate">6 Security Headers Modern</p>
+                                <p class="text-[10px] text-slate-500 truncate">CSP, HSTS, XFO, XCTO, Referrer, Permissions</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                            <div class="w-7 h-7 rounded-md bg-cyan-100 text-cyan-700 flex items-center justify-center shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-bold text-slate-800 truncate">Proteksi Flag Cookie</p>
+                                <p class="text-[10px] text-slate-500 truncate">Atribut Secure, HttpOnly, SameSite (-5)</p>
                             </div>
                         </div>
 
@@ -550,7 +578,7 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] font-bold text-slate-800 truncate">Sensitif File Audit</p>
-                                <p class="text-[10px] text-slate-500 truncate">.env, .git, backup</p>
+                                <p class="text-[10px] text-slate-500 truncate">.env, .git, backup (-15 Poin)</p>
                             </div>
                         </div>
 
@@ -559,8 +587,8 @@
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[11px] font-bold text-slate-800 truncate">Web Shell Probe</p>
-                                <p class="text-[10px] text-slate-500 truncate">Backdoor & upload</p>
+                                <p class="text-[11px] font-bold text-slate-800 truncate">Web Shell &amp; Upload</p>
+                                <p class="text-[10px] text-slate-500 truncate">Backdoor (-15) / Upload (-8)</p>
                             </div>
                         </div>
 
@@ -570,7 +598,7 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] font-bold text-slate-800 truncate">SQL Injection</p>
-                                <p class="text-[10px] text-slate-500 truncate">Sanitisasi input</p>
+                                <p class="text-[10px] text-slate-500 truncate">Injeksi &amp; sanitisasi (-15 Poin)</p>
                             </div>
                         </div>
 
@@ -579,8 +607,8 @@
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[11px] font-bold text-slate-800 truncate">Brute-Force & Auth</p>
-                                <p class="text-[10px] text-slate-500 truncate">Rate-limit & captcha</p>
+                                <p class="text-[11px] font-bold text-slate-800 truncate">Brute-Force &amp; Auth</p>
+                                <p class="text-[10px] text-slate-500 truncate">Rate-limit &amp; CAPTCHA (-10 Poin)</p>
                             </div>
                         </div>
 
@@ -590,7 +618,7 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] font-bold text-slate-800 truncate">File Integrity (FIM)</p>
-                                <p class="text-[10px] text-slate-500 truncate">Debug & config leak</p>
+                                <p class="text-[10px] text-slate-500 truncate">Debug &amp; config (-5 s/d -15 Poin)</p>
                             </div>
                         </div>
 
@@ -600,23 +628,353 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] font-bold text-slate-800 truncate">Framework Version</p>
-                                <p class="text-[10px] text-slate-500 truncate">CMS & server leak</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-2.5 p-2.5 rounded-lg bg-gov-50 border border-gov-200">
-                            <div class="w-7 h-7 rounded-md bg-gov-600 text-white flex items-center justify-center shrink-0">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="text-[11px] font-bold text-gov-900 truncate">Indeks Kepatuhan</p>
-                                <p class="text-[10px] text-gov-700 truncate">Skala 0 - 100 Poin</p>
+                                <p class="text-[10px] text-slate-500 truncate">CMS &amp; server leak (-10 Poin)</p>
                             </div>
                         </div>
 
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- Card Metodologi & Standar Pembobotan Penilaian (OWASP Top 10, Secure Headers & CVSS v3.1) -->
+        <div id="methodologyCard" class="gov-card rounded-2xl p-6 sm:p-8 bg-white border border-slate-200 mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-5 border-b border-slate-200">
+                <div class="flex items-start space-x-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-gov-700 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                                Metodologi & Standar Pembobotan Penilaian Keamanan
+                            </h3>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-gov-50 text-gov-800 border border-gov-200">
+                                Rujukan Standar Internasional
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            Setiap domain memulai evaluasi dengan skor dasar <strong>100 poin</strong>. Pengurangan poin (<em>penalti</em>) dihitung secara proporsional berdasarkan tingkat keparahan risiko (<em>Severity Level</em>) mengacu pada standar keamanan aplikasi web <strong>OWASP Top 10 (2021)</strong>, <strong>OWASP Secure Headers Project</strong>, dan <strong>CVSS v3.1</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3 Standar Acuan Badges -->
+                <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-slate-900 text-white">
+                        OWASP Top 10 (2021)
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-gov-50 text-gov-800 border border-gov-200">
+                        OWASP Secure Headers
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        CVSS v3.1 Severity
+                    </span>
+                </div>
+            </div>
+
+            <!-- Rumus & Klasifikasi Predikat Skor -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 my-5">
+                <div class="md:col-span-2 p-3.5 rounded-xl bg-slate-900 text-white flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-gov-300 font-bold">Formula Perhitungan Skor</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">Skala 0 – 100</span>
+                    </div>
+                    <p class="font-mono text-sm sm:text-base font-bold text-white my-1.5">
+                        Skor Akhir = max(0, 100 &minus; &Sigma; Bobot Penalti)
+                    </p>
+                    <p class="text-[11px] text-slate-300 leading-snug">
+                        Akumulasi penalti maksimal dari seluruh modul pengujian adalah <strong>100 poin</strong>, dibagi ke dalam 4 tingkatan risiko CVSS: <strong>Kritis (-15)</strong>, <strong>Tinggi (-10)</strong>, <strong>Sedang (-7 s/d -8)</strong>, dan <strong>Rendah (-5)</strong>.
+                    </p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col justify-center">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-emerald-900">Grade A+ / A</span>
+                        <span class="font-mono text-xs font-extrabold px-2 py-0.5 rounded bg-emerald-600 text-white">80 – 100</span>
+                    </div>
+                    <p class="text-[11px] font-semibold text-emerald-800">Aman / Optimal</p>
+                    <p class="text-[10px] text-emerald-700 mt-0.5">Risiko Rendah. Memenuhi standar kelayakan keamanan SPBE.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex flex-col justify-center">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-amber-900">Grade B / C</span>
+                        <span class="font-mono text-xs font-extrabold px-2 py-0.5 rounded bg-amber-500 text-white">50 – 79</span>
+                    </div>
+                    <p class="text-[11px] font-semibold text-amber-800">Waspada / Perlu Perhatian</p>
+                    <p class="text-[10px] text-amber-700 mt-0.5">Risiko Moderat. Terdapat konfigurasi keamanan yang belum aktif.</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-rose-50/70 border border-rose-200 flex flex-col justify-center">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-rose-900">Grade F</span>
+                        <span class="font-mono text-xs font-extrabold px-2 py-0.5 rounded bg-rose-600 text-white">&lt; 50</span>
+                    </div>
+                    <p class="text-[11px] font-semibold text-rose-800">Kritis & Rentan</p>
+                    <p class="text-[10px] text-rose-700 mt-0.5">Risiko Tinggi. Ditemukan celah fatal yang wajib segera diperbaiki.</p>
+                </div>
+            </div>
+
+            <!-- Tabel Pemetaan: Pemeriksaan -> Kategori OWASP -> Tingkat Risiko -> Bobot -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                            <th class="py-3 px-3 text-center w-10">No</th>
+                            <th class="py-3 px-4">Parameter Pemeriksaan</th>
+                            <th class="py-3 px-4">Kategori Standar (OWASP Top 10 / Secure Headers)</th>
+                            <th class="py-3 px-3 text-center">Tingkat Risiko (CVSS)</th>
+                            <th class="py-3 px-3 text-center">Bobot Penalti</th>
+                            <th class="py-3 px-4">Dasar Penilaian & Dampak Eksploitasi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">1</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">SQL Injection (SQLi)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A03:2021 &ndash; Injection
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    Kritis (Critical)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-rose-700">-15 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Memungkinkan penyerang membaca, memodifikasi, atau menghapus isi database secara langsung tanpa autentikasi.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">2</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Web Shell Detection</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A08:2021 &ndash; Software &amp; Data Integrity
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    Kritis (Critical)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-rose-700">-15 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Indikasi server telah disusupi skrip <em>backdoor</em> yang memberikan akses kendali penuh (<em>Remote Code Execution</em>).</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">3</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Sensitive Data Leak (.env, .git, backup)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A01:2021 &ndash; Broken Access Control
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    Kritis (Critical)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-rose-700">-15 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Mengekspos kredensial database, <em>APP_KEY</em>, konfigurasi sistem, serta repositori kode sumber langsung ke publik.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">4</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Validitas SSL/TLS &amp; Versi Protokol</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A02:2021 &ndash; Cryptographic Failures
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
+                                    Tinggi (High)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-orange-700">-8 / -10 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Sertifikat SSL gagal diverifikasi CA / <em>self-signed</em> / <em>expired</em> (<code>-10</code>) atau memakai protokol usang di bawah TLSv1.2 (<code>-8</code>).</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">5</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">File Integrity / Debug Config Exposed</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A05:2021 &ndash; Security Misconfiguration
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
+                                    Tinggi (High)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-orange-700">-5 s/d -15 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Penalti <code>-5 poin</code> per file (maksimal <code>-15</code>) atas terbukanya file diagnostik (<code>phpinfo.php</code>, <code>.htaccess</code>, <code>web.config</code>).</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">6</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Content-Security-Policy (CSP)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A03:2021 (XSS) &amp; OWASP Secure Headers
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
+                                    Tinggi (High)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-orange-700">-10 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Ketiadaan CSP membuka celah eksekusi skrip berbahaya (<em>Cross-Site Scripting</em> / XSS) untuk mencuri sesi pengguna.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">7</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Brute-Force &amp; Auth Protection</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A07:2021 &ndash; Identification &amp; Auth Failures
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
+                                    Tinggi (High)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-orange-700">-10 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Halaman login tanpa CAPTCHA atau <em>Rate-Limiting</em> rentan terhadap penebakan kata sandi terotomasi (<em>Brute-Force</em>).</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">8</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Framework &amp; Version Exposure</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A06:2021 &ndash; Vulnerable &amp; Outdated Components
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    Sedang (Medium)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-amber-700">-10 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Eksposur versi <code>Server</code>, <code>X-Powered-By</code>, dan generator CMS mempermudah pencarian eksploitasi CVE spesifik versi.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">9</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Strict-Transport-Security (HSTS)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A02:2021 &ndash; Cryptographic Failures
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    Sedang (Medium)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-amber-700">-8 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Tanpa HSTS, komunikasi terenkripsi HTTPS rentan diturunkan paksa ke HTTP (<em>SSL Stripping</em> / penyadapan jaringan).</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">10</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Unvalidated File Upload</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A04:2021 &ndash; Insecure Design
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    Sedang (Medium)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-amber-700">-8 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Input unggah file tanpa pembatasan tipe (<code>accept</code>) berisiko disalahgunakan untuk menyisipkan file berbahaya.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">11</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">X-Frame-Options (XFO)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A05:2021 &amp; OWASP Secure Headers
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    Sedang (Medium)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-amber-700">-7 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Tanpa proteksi XFO, halaman web dapat dimuat ke dalam <code>&lt;iframe&gt;</code> eksternal untuk menjebak klik (<em>Clickjacking</em>).</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">12</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Redirect HTTP ke HTTPS (Port 80)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A02:2021 &ndash; Cryptographic Failures
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    Sedang (Medium)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-amber-700">-5 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Akses melalui protokol HTTP biasa (port 80) tidak dialihkan secara otomatis (301/302) menuju koneksi terenkripsi HTTPS.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">13</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Flag Keamanan Cookie (Secure, HttpOnly, SameSite)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A05:2021 &ndash; Security Misconfiguration
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    Sedang (Medium)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-amber-700">-5 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Cookie sesi yang dibuat server tanpa atribut <code>Secure</code>, <code>HttpOnly</code>, atau <code>SameSite</code> rentan dicuri lewat XSS/CSRF.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">14</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">X-Content-Type-Options (XCTO)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    A05:2021 &amp; OWASP Secure Headers
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                    Rendah (Low)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-blue-700">-5 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Mencegah browser menebak tipe MIME secara otomatis (<em>MIME-sniffing</em>) terhadap respon file dari server.</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50/80">
+                            <td class="py-3 px-3 text-center font-mono text-slate-400">15</td>
+                            <td class="py-3 px-4 font-bold text-slate-900 font-mono">Header Modern (Referrer-Policy &amp; Permissions-Policy)</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                    OWASP Secure Headers Project
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                    Rendah (Low)
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-mono font-extrabold text-blue-700">-3 &amp; -2 Poin</td>
+                            <td class="py-3 px-4 text-slate-600 leading-relaxed">Mencegah kebocoran URL pada header <code>Referer</code> (<code>-3</code>) serta membatasi izin fitur sensitif browser seperti kamera/lokasi (<code>-2</code>).</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -811,7 +1169,6 @@
                         <svg class="w-4 h-4 text-gov-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        <span>Memerlukan rekapitulasi audit seluruh OPD untuk lampiran laporan resmi PKL?</span>
                     </div>
                     <a href="{{ route('scan.reports') }}" class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-gov-700 hover:bg-gov-800 text-white font-bold text-xs shadow-sm transition-all shrink-0">
                         <span>Buka Rekapitulasi Laporan</span>
@@ -909,7 +1266,7 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] font-medium text-slate-500">
-                    <span>Standar Kepatuhan: BSSN RI No. 8/2020</span>
+                    <span>Standar Acuan: OWASP Top 10 &amp; CVSS v3.1</span>
                     <span>&bull;</span>
                     <span>SPBE Keamanan Informasi</span>
                     <span>&bull;</span>
@@ -1248,6 +1605,17 @@
                 activateStep('step8');
             }, 12000);
         });
+
+        function toggleMethodologyCard() {
+            const card = document.getElementById('methodologyCard');
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                card.classList.add('ring-2', 'ring-gov-500');
+                setTimeout(() => {
+                    card.classList.remove('ring-2', 'ring-gov-500');
+                }, 1800);
+            }
+        }
     </script>
 </body>
 </html>

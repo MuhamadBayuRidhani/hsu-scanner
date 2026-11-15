@@ -23,6 +23,155 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Skala Predikat Keamanan (SATU-SATUNYA sumber kebenaran)
+    |--------------------------------------------------------------------------
+    |
+    | Seluruh halaman (dashboard, rekap, detail hasil, laporan cetak resmi)
+    | membaca batas predikat dari sini melalui App\Support\SecurityGrade.
+    | Jangan menulis angka batas skor secara langsung di controller / view.
+    |
+    | 'status' mengelompokkan predikat huruf ke 3 kategori ringkas:
+    |   secure   = Aman, warning = Waspada, critical = Kritis
+    | Urutan wajib dari skor tertinggi ke terendah dan tidak boleh ada celah.
+    |
+    */
+    'grades' => [
+        [
+            'grade'  => 'A',
+            'min'    => 85,
+            'max'    => 100,
+            'label'  => 'Sangat Baik',
+            'status' => 'secure',
+            'risk'   => 'Rendah',
+            'color'  => 'emerald',
+            'desc'   => 'Konfigurasi keamanan server target telah memenuhi standar optimal dan memiliki perlindungan berlapis.',
+        ],
+        [
+            'grade'  => 'B',
+            'min'    => 70,
+            'max'    => 84,
+            'label'  => 'Baik',
+            'status' => 'secure',
+            'risk'   => 'Moderat Rendah',
+            'color'  => 'blue',
+            'desc'   => 'Sebagian besar proteksi aktif, namun beberapa konfigurasi penting disarankan untuk dilengkapi.',
+        ],
+        [
+            'grade'  => 'C',
+            'min'    => 50,
+            'max'    => 69,
+            'label'  => 'Perlu Perhatian',
+            'status' => 'warning',
+            'risk'   => 'Moderat',
+            'color'  => 'amber',
+            'desc'   => 'Ditemukan celah keamanan atau parameter proteksi yang belum diaktifkan sehingga perlu evaluasi berkala.',
+        ],
+        [
+            'grade'  => 'D',
+            'min'    => 0,
+            'max'    => 49,
+            'label'  => 'Kritis & Rentan',
+            'status' => 'critical',
+            'risk'   => 'Tinggi',
+            'color'  => 'rose',
+            'desc'   => 'Terdapat celah serius atau minim pertahanan standar. Diperlukan tindakan perbaikan konfigurasi segera.',
+        ],
+    ],
+
+    'statuses' => [
+        'secure'   => ['label' => 'Aman',    'color' => 'emerald'],
+        'warning'  => ['label' => 'Waspada', 'color' => 'amber'],
+        'critical' => ['label' => 'Kritis',  'color' => 'rose'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Katalog Modul Pengujian (nama resmi fitur di dashboard & laporan)
+    |--------------------------------------------------------------------------
+    |
+    | Key = nilai 'category' yang dikirim scanner.py.
+    | 'scored' = false berarti modul bersifat pemantauan (tidak mengurangi skor).
+    |
+    */
+    'checks' => [
+        'header_security' => [
+            'label'    => 'HTTP Security Headers',
+            'label_id' => 'Header Keamanan HTTP',
+            'hint'     => 'CSP, HSTS, X-Frame, X-Content-Type',
+            'color'    => 'blue',
+            'scored'   => true,
+        ],
+        'sensitive_leak' => [
+            'label'    => 'Sensitive File Leak',
+            'label_id' => 'Kebocoran File Sensitif',
+            'hint'     => '.env, .git/config, backup.zip',
+            'color'    => 'rose',
+            'scored'   => true,
+        ],
+        'webshell' => [
+            'label'    => 'Web Shell Detection',
+            'label_id' => 'Deteksi Web Shell / Backdoor',
+            'hint'     => 'shell.php, c99, r57, wso, b374k',
+            'color'    => 'orange',
+            'scored'   => true,
+        ],
+        'upload_validation' => [
+            'label'    => 'Client-side Upload Validation Check',
+            'label_id' => 'Pemeriksaan Validasi Upload Sisi Klien',
+            'hint'     => 'Atribut accept pada input file',
+            'color'    => 'yellow',
+            'scored'   => true,
+        ],
+        'sqli_sanitization' => [
+            'label'    => 'SQL Injection & Input Sanitization',
+            'label_id' => 'SQL Injection & Sanitasi Input',
+            'hint'     => 'Error-based SQLi probe',
+            'color'    => 'red',
+            'scored'   => true,
+        ],
+        'auth_bruteforce' => [
+            'label'    => 'Authentication & Brute-Force Protection',
+            'label_id' => 'Autentikasi & Proteksi Brute-Force',
+            'hint'     => 'Rate-limit & CAPTCHA',
+            'color'    => 'indigo',
+            'scored'   => true,
+        ],
+        'exposed_config' => [
+            'label'    => 'Exposed Debug & Configuration Files',
+            'label_id' => 'File Debug & Konfigurasi Terekspos',
+            'hint'     => 'phpinfo.php, .htaccess, web.config',
+            'color'    => 'amber',
+            'scored'   => true,
+        ],
+        'info_disclosure' => [
+            'label'    => 'Information Disclosure (Version Exposure)',
+            'label_id' => 'Pengungkapan Informasi Versi',
+            'hint'     => 'X-Powered-By, Server, meta generator',
+            'color'    => 'purple',
+            'scored'   => true,
+        ],
+        'asset_integrity' => [
+            'label'    => 'Public Asset Integrity & Defacement Monitoring',
+            'label_id' => 'Pemantauan Integritas Aset Publik & Defacement',
+            'hint'     => 'Hash SHA-256 HTML, JS & CSS vs baseline',
+            'color'    => 'teal',
+            'scored'   => false,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Alias Kategori Lama (data audit sebelum revisi penamaan)
+    |--------------------------------------------------------------------------
+    */
+    'legacy_check_aliases' => [
+        'fim'                  => 'exposed_config',
+        'dependency_framework' => 'info_disclosure',
+        // 'upload_webshell' dipecah berdasarkan nama temuan (lihat SecurityCheck)
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Katalog Lengkap Website Pemerintah & Instansi Vertikal HSU
     |--------------------------------------------------------------------------
     |

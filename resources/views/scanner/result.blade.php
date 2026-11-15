@@ -227,7 +227,9 @@
 
             // Definisikan label kategori
             $categoryLabels = [
-                'header_security'       => ['label' => 'Security Headers', 'color' => 'blue'],
+                'ssl_tls'               => ['label' => 'Validitas SSL/TLS & Redirect HTTPS', 'color' => 'teal'],
+                'header_security'       => ['label' => 'Security Headers Modern', 'color' => 'blue'],
+                'cookie_security'       => ['label' => 'Proteksi Flag Cookie', 'color' => 'cyan'],
                 'sensitive_leak'        => ['label' => 'Sensitive Data Leak', 'color' => 'rose'],
                 'upload_webshell'       => ['label' => 'File Upload & Web Shell', 'color' => 'orange'],
                 'sqli_sanitization'     => ['label' => 'SQL Injection & Input Sanitization', 'color' => 'red'],
@@ -262,33 +264,49 @@
 
             function getRemediation($name, $category = '') {
                 if (str_contains($name, 'Sensitive Data')) {
-                    return ['Kritis', 'Segera kunci atau hapus file sensitif (.env, backup.zip, .git) dari DocumentRoot web. Konfigurasikan rule pada web server untuk memblokir akses ke file tersembunyi.'];
+                    return ['Kritis', 'Segera kunci atau hapus file sensitif (.env, backup.zip, .git) dari DocumentRoot web. Konfigurasikan rule pada web server untuk memblokir akses ke file tersembunyi.', 'OWASP A01:2021 – Broken Access Control'];
+                } elseif (str_contains($name, 'SSL/TLS Certificate')) {
+                    return ['Tinggi', 'Pasang sertifikat SSL/TLS resmi dari Certificate Authority (CA) terpercaya (seperti Let\'s Encrypt / DigiCert), perbarui sertifikat yang kedaluwarsa, dan pastikan rantai sertifikat (chain) lengkap.', 'OWASP A02:2021 – Cryptographic Failures'];
+                } elseif (str_contains($name, 'Deprecated TLS')) {
+                    return ['Sedang', 'Nonaktifkan protokol enkripsi usang (TLSv1.0 dan TLSv1.1) pada konfigurasi web server (Nginx/Apache/IIS) dan hanya izinkan protokol modern TLSv1.2 serta TLSv1.3.', 'OWASP A02:2021 – Cryptographic Failures'];
+                } elseif (str_contains($name, 'HTTP to HTTPS Redirect')) {
+                    return ['Sedang', 'Tambahkan aturan pengalihan permanen (HTTP 301 Redirect) pada konfigurasi virtual host port 80 agar setiap trafik HTTP otomatis dialihkan ke HTTPS.', 'OWASP A02:2021 – Cryptographic Failures'];
                 } elseif (str_contains($name, 'Content-Security-Policy')) {
-                    return ['Tinggi', 'Tambahkan header Content-Security-Policy untuk mengatur sumber konten yang sah, mencegah serangan injeksi skrip (XSS) dan pemuatan resource tidak aman.'];
+                    return ['Tinggi', 'Tambahkan header Content-Security-Policy untuk mengatur sumber konten yang sah, mencegah serangan injeksi skrip (XSS) dan pemuatan resource tidak aman.', 'OWASP A03:2021 (XSS) & Secure Headers'];
                 } elseif (str_contains($name, 'Strict-Transport-Security')) {
-                    return ['Tinggi', 'Tambahkan header Strict-Transport-Security (HSTS) dengan max-age minimal 1 tahun agar peramban selalu mengunci sambungan ke protokol HTTPS.'];
+                    return ['Sedang', 'Tambahkan header Strict-Transport-Security (HSTS) dengan max-age minimal 1 tahun agar peramban selalu mengunci sambungan ke protokol HTTPS.', 'OWASP A02:2021 – Cryptographic Failures'];
                 } elseif (str_contains($name, 'X-Frame-Options')) {
-                    return ['Sedang', 'Tambahkan header X-Frame-Options: SAMEORIGIN untuk melindungi web dari pembajakan frame atau antarmuka (Clickjacking).'];
+                    return ['Sedang', 'Tambahkan header X-Frame-Options: SAMEORIGIN untuk melindungi web dari pembajakan frame atau antarmuka (Clickjacking).', 'OWASP A05:2021 & Secure Headers'];
                 } elseif (str_contains($name, 'X-Content-Type-Options')) {
-                    return ['Sedang', 'Tambahkan header X-Content-Type-Options: nosniff untuk mencegah peramban melakukan penafsiran MIME type secara otomatis (MIME-sniffing).'];
+                    return ['Rendah', 'Tambahkan header X-Content-Type-Options: nosniff untuk mencegah peramban melakukan penafsiran MIME type secara otomatis (MIME-sniffing).', 'OWASP A05:2021 & Secure Headers'];
+                } elseif (str_contains($name, 'Referrer-Policy')) {
+                    return ['Rendah', 'Tambahkan header Referrer-Policy: strict-origin-when-cross-origin agar parameter URL sensitif tidak bocor melalui header Referer ke domain eksternal.', 'OWASP Secure Headers Project'];
+                } elseif (str_contains($name, 'Permissions-Policy')) {
+                    return ['Rendah', 'Tambahkan header Permissions-Policy (misalnya camera=(), microphone=(), geolocation=()) untuk membatasi penyalahgunaan fitur perangkat keras peramban.', 'OWASP Secure Headers Project'];
+                } elseif (str_contains($name, 'Cookie Flags')) {
+                    return ['Sedang', 'Pastikan setiap cookie sesi yang dikirim server mengaktifkan atribut Secure (hanya dikirim via HTTPS), HttpOnly (tidak bisa diakses JavaScript/XSS), dan SameSite=Lax/Strict (proteksi CSRF).', 'OWASP A05:2021 – Security Misconfiguration'];
                 } elseif (str_contains($name, 'Web Shell')) {
-                    return ['Kritis', 'SEGERA isolasi server dan hapus file web shell teridentifikasi! Lakukan audit integritas seluruh direktori web dan periksa log akses web server.'];
+                    return ['Kritis', 'SEGERA isolasi server dan hapus file web shell teridentifikasi! Lakukan audit integritas seluruh direktori web dan periksa log akses web server.', 'OWASP A08:2021 – Software & Data Integrity'];
                 } elseif (str_contains($name, 'Unvalidated File Upload')) {
-                    return ['Tinggi', 'Batasi tipe file pada form upload menggunakan atribut accept dan lakukan validasi ketat (ekstensi, tipe MIME, isi file) di sisi server sebelum disimpan.'];
+                    return ['Sedang', 'Batasi tipe file pada form upload menggunakan atribut accept dan lakukan validasi ketat (ekstensi, tipe MIME, isi file) di sisi server sebelum disimpan.', 'OWASP A04:2021 – Insecure Design'];
                 } elseif (str_contains($name, 'SQL Injection')) {
-                    return ['Kritis', 'Terapkan Prepared Statement / Parameterized Queries pada semua query database. Hindari merangkai parameter masukan pengguna langsung ke string SQL.'];
+                    return ['Kritis', 'Terapkan Prepared Statement / Parameterized Queries pada semua query database. Hindari merangkai parameter masukan pengguna langsung ke string SQL.', 'OWASP A03:2021 – Injection'];
                 } elseif (str_contains($name, 'Brute-Force')) {
-                    return ['Tinggi', 'Terapkan pembatasan percobaan login (Rate Limiting) dan pasang verifikasi CAPTCHA (Turnstile / reCAPTCHA) pada form autentikasi.'];
+                    return ['Tinggi', 'Terapkan pembatasan percobaan login (Rate Limiting) dan pasang verifikasi CAPTCHA (Turnstile / reCAPTCHA) pada form autentikasi.', 'OWASP A07:2021 – Auth Failures'];
                 } elseif (str_contains($name, 'Debug') || str_contains($name, 'Config Files')) {
-                    return ['Tinggi', 'Hapus atau batasi hak akses publik ke file instalasi, debug, atau informasi server seperti phpinfo.php, readme.html, dan license.txt.'];
+                    return ['Tinggi', 'Hapus atau batasi hak akses publik ke file instalasi, debug, atau informasi server seperti phpinfo.php, readme.html, dan license.txt.', 'OWASP A05:2021 – Security Misconfiguration'];
                 } elseif (str_contains($name, 'Framework') || str_contains($name, 'Version')) {
-                    return ['Sedang', 'Sembunyikan header X-Powered-By, versi Server, dan meta generator CMS agar penyerang tidak dapat memetakan kelemahan versi spesifik.'];
+                    return ['Sedang', 'Sembunyikan header X-Powered-By, versi Server, dan meta generator CMS agar penyerang tidak dapat memetakan kelemahan versi spesifik.', 'OWASP A06:2021 – Vulnerable Components'];
                 }
-                return ['Sedang', 'Terapkan konfigurasi pengerasan sistem (hardening) yang sesuai standar best practice keamanan.'];
+                return ['Sedang', 'Terapkan konfigurasi pengerasan sistem (hardening) yang sesuai standar best practice keamanan.', 'OWASP A05:2021 – Security Misconfiguration'];
             }
 
             function getPassedBenefit($name) {
-                if ($name === 'Content-Security-Policy') {
+                if (str_contains($name, 'SSL/TLS Valid')) {
+                    return 'Sertifikat SSL/TLS terverifikasi valid oleh CA dan menggunakan versi protokol enkripsi modern.';
+                } elseif (str_contains($name, 'HTTP to HTTPS Redirect')) {
+                    return 'Akses melalui HTTP biasa (port 80) otomatis dialihkan secara aman ke protokol HTTPS.';
+                } elseif ($name === 'Content-Security-Policy') {
                     return 'Kebijakan sumber konten aktif (Perlindungan terhadap serangan Cross-Site Scripting).';
                 } elseif ($name === 'Strict-Transport-Security') {
                     return 'Browser diwajibkan selalu menggunakan koneksi terenkripsi HTTPS secara ketat.';
@@ -296,6 +314,12 @@
                     return 'Proteksi pembajakan klik dalam iFrame (Clickjacking) aktif.';
                 } elseif ($name === 'X-Content-Type-Options') {
                     return 'Pencegahan MIME-sniffing aktif untuk melindungi file berformat teks/skrip.';
+                } elseif ($name === 'Referrer-Policy') {
+                    return 'Kebijakan pengiriman informasi Referer antar-domain terkendali dengan aman.';
+                } elseif ($name === 'Permissions-Policy') {
+                    return 'Pembatasan izin akses fitur API sensitif peramban (kamera, mikrofon, lokasi) telah aktif.';
+                } elseif (str_contains($name, 'Cookie Security')) {
+                    return 'Cookie yang dibuat server telah dilengkapi atribut proteksi (Secure, HttpOnly, SameSite).';
                 } elseif (str_contains($name, 'Sensitive File')) {
                     return 'File sensitif (.env, .git, backup arsip) terlindungi dan tidak bocor ke publik.';
                 } elseif (str_contains($name, 'File Upload') || str_contains($name, 'Web Shell')) {
@@ -495,7 +519,7 @@
                                             $name = $failed['name'] ?? '';
                                             $desc = $failed['desc'] ?? '';
                                             $minus = $failed['minus'] ?? '-0';
-                                            [$severity, $remediation] = getRemediation($name, $catKey);
+                                            [$severity, $remediation, $owaspRef] = getRemediation($name, $catKey);
 
                                             if ($severity === 'Kritis') {
                                                 $sevBadge = 'bg-rose-50 text-rose-700 border-rose-200';
@@ -503,6 +527,9 @@
                                             } elseif ($severity === 'Tinggi') {
                                                 $sevBadge = 'bg-orange-50 text-orange-700 border-orange-200';
                                                 $accentBorder = 'border-l-orange-500';
+                                            } elseif ($severity === 'Rendah') {
+                                                $sevBadge = 'bg-blue-50 text-blue-700 border-blue-200';
+                                                $accentBorder = 'border-l-blue-500';
                                             } else {
                                                 $sevBadge = 'bg-amber-50 text-amber-700 border-amber-200';
                                                 $accentBorder = 'border-l-amber-500';
@@ -515,7 +542,10 @@
                                                     <div class="flex flex-wrap items-center gap-2">
                                                         <h3 class="font-bold text-sm text-slate-900 font-mono">{{ $name }}</h3>
                                                         <span class="px-2 py-0.5 text-[10px] font-bold rounded border {{ $sevBadge }}">
-                                                            {{ $severity }}
+                                                            Risiko {{ $severity }}
+                                                        </span>
+                                                        <span class="px-2 py-0.5 text-[10px] font-mono font-semibold rounded bg-slate-100 text-slate-700 border border-slate-200">
+                                                            {{ $owaspRef }}
                                                         </span>
                                                     </div>
                                                     <p class="text-xs text-slate-600 mt-1 leading-relaxed">{{ $desc }}</p>
@@ -620,7 +650,13 @@
 
                 <!-- Guidance & Score Standard Box (Clean White) -->
                 <div class="clean-card rounded-xl p-5 space-y-3">
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-700">Panduan Skor Keamanan</p>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-700">Panduan Skor & Metodologi</p>
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">Basis 100 Poin</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        Skor dihitung dengan rumus <code class="font-mono font-bold text-slate-700">100 &minus; &Sigma; Penalti</code> mengacu pada <strong>OWASP Top 10 (2021)</strong>, <strong>OWASP Secure Headers Project</strong>, dan <strong>CVSS v3.1</strong>.
+                    </p>
                     <div class="space-y-2 text-xs">
                         <div class="flex items-center justify-between p-2 rounded-lg bg-emerald-50/80 border border-emerald-200/60">
                             <span class="font-bold text-emerald-800">85 - 100 Poin (A+)</span>
@@ -637,6 +673,27 @@
                         <div class="flex items-center justify-between p-2 rounded-lg bg-rose-50/80 border border-rose-200/60">
                             <span class="font-bold text-rose-800">&lt; 50 Poin (F)</span>
                             <span class="text-rose-700 font-medium">Kritis & Rentan</span>
+                        </div>
+                    </div>
+
+                    <!-- Rincian Bobot Penalti per Tingkat Risiko -->
+                    <div class="pt-3 border-t border-slate-100 space-y-1.5 text-[11px]">
+                        <p class="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Rujukan Bobot Penalti (CVSS Severity):</p>
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span><strong class="text-rose-700">Kritis:</strong> SQLi, Web Shell, File Sensitif Bocor</span>
+                            <span class="font-mono font-bold text-rose-700">-15 Poin</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span><strong class="text-orange-700">Tinggi:</strong> SSL Invalid, CSP, Brute-Force, FIM</span>
+                            <span class="font-mono font-bold text-orange-700">-10 / -15</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span><strong class="text-amber-700">Sedang:</strong> TLS, HSTS, XFO, Redirect, Cookie</span>
+                            <span class="font-mono font-bold text-amber-700">-5 s/d -10</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span><strong class="text-blue-700">Rendah:</strong> XCTO, Referrer, Permissions-Policy</span>
+                            <span class="font-mono font-bold text-blue-700">-2 s/d -5</span>
                         </div>
                     </div>
                 </div>

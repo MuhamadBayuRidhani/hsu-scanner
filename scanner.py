@@ -2,8 +2,10 @@ import sys
 import json
 import warnings
 import re
+import ssl
+import socket
 
-# Abaikan warning SSL yang muncul jika website target menggunakan sertifikat self-signed / expired
+# Abaikan warning urllib3 saat melakukan fallback ke verify=False setelah pencatatan status SSL
 warnings.filterwarnings('ignore')
 
 import os
@@ -76,27 +78,69 @@ def run_scan(url):
     }
 
     # =========================================================================
-    # TAHAP 1: Tes Koneksi dan Ambil Header + Body
+    # TAHAP 1: Validasi SSL/TLS, Versi Protokol, Redirect HTTP->HTTPS & Koneksi
     # =========================================================================
+    ssl_valid = False
+    tls_version = None
+    ssl_issue_detail = ""
+    https_port = parsed_url.port if (parsed_url.scheme == 'https' and parsed_url.port) else 443
+
+    # 1A. Cek langsung sertifikat SSL/TLS & versi protokol TLS menggunakan modul ssl
+    try:
+        ctx = ssl.create_default_context()
+        with socket.create_connection((hostname, https_port), timeout=6) as sock:
+            with ctx.wrap_socket(sock, server_hostname=hostname) as ssock:
+                tls_version = ssock.version()
+                ssl_valid = True
+    except ssl.SSLCertVerificationError as cert_err:
+        ssl_valid = False
+        reason = getattr(cert_err, 'verify_message', None) or str(cert_err)
+        ssl_issue_detail = f"Sertifikat SSL tidak valid atau self-signed/expired ({reason})."
+        try:
+            unverified_ctx = ssl._create_unverified_context()
+            with socket.create_connection((hostname, https_port), timeout=5) as sock:
+                with unverified_ctx.wrap_socket(sock, server_hostname=hostname) as ssock:
+                    tls_version = ssock.version()
+        except Exception:
+            pass
+    except ssl.SSLError as ssl_err:
+        ssl_valid = False
+        ssl_issue_detail = f"Kegagalan handshake SSL/TLS ({str(ssl_err)})."
+    except Exception:
+        ssl_valid = False
+        ssl_issue_detail = "Port HTTPS (443) tidak merespon atau server belum mendukung SSL/TLS."
+
+    # 1B. Ambil response utama: coba verify=True terlebih dahulu sebelum fallback ke verify=False
     headers = {}
     body = ''
+    response = None
     try:
-        response = requests.get(url, headers=req_headers, timeout=12, verify=False, allow_redirects=True)
+        response = requests.get(url, headers=req_headers, timeout=12, verify=True, allow_redirects=True)
         headers = {k.lower(): v for k, v in response.headers.items()}
         body = response.text
-    except requests.exceptions.SSLError:
-        # Coba fallback ke HTTP jika koneksi HTTPS terkendala sertifikat SSL
-        if url.startswith('https://'):
-            try:
-                url_http = 'http://' + url[8:]
-                response = requests.get(url_http, headers=req_headers, timeout=12, verify=False, allow_redirects=True)
-                headers = {k.lower(): v for k, v in response.headers.items()}
-                body = response.text
-                url = url_http
-            except Exception as e:
-                return {"score": 0, "error": f"Gagal Scan: Kendala sertifikat SSL dan koneksi HTTP gagal.", "failed": [], "passed": []}
-        else:
-            return {"score": 0, "error": "Gagal Scan: Masalah sertifikat SSL pada domain target.", "failed": [], "passed": []}
+        if response.url.lower().startswith('https://'):
+            ssl_valid = True
+    except requests.exceptions.SSLError as req_ssl_err:
+        ssl_valid = False
+        if not ssl_issue_detail:
+            ssl_issue_detail = "Sertifikat SSL/TLS gagal diverifikasi oleh Certificate Authority (CA)."
+        # Tetap lanjutkan pemindaian menggunakan verify=False setelah status SSL dicatat
+        try:
+            response = requests.get(url, headers=req_headers, timeout=12, verify=False, allow_redirects=True)
+            headers = {k.lower(): v for k, v in response.headers.items()}
+            body = response.text
+        except Exception:
+            if url.startswith('https://'):
+                try:
+                    url_http = 'http://' + url[8:]
+                    response = requests.get(url_http, headers=req_headers, timeout=12, verify=False, allow_redirects=True)
+                    headers = {k.lower(): v for k, v in response.headers.items()}
+                    body = response.text
+                    url = url_http
+                except Exception:
+                    return {"score": 0, "error": "Gagal Scan: Kendala sertifikat SSL dan koneksi HTTP gagal.", "failed": [], "passed": []}
+            else:
+                return {"score": 0, "error": "Gagal Scan: Masalah sertifikat SSL pada domain target.", "failed": [], "passed": []}
     except requests.exceptions.ConnectionError as e:
         error_msg = str(e)
         if "getaddrinfo failed" in error_msg or "Name or service not known" in error_msg:
@@ -106,12 +150,30 @@ def run_scan(url):
                 "failed": [],
                 "passed": []
             }
-        return {
-            "score": 0,
-            "error": "Gagal Scan: Server target tidak merespon atau koneksi ditolak.",
-            "failed": [],
-            "passed": []
-        }
+        # Coba fallback ke HTTP jika HTTPS pada port 443 ditolak tetapi port 80 aktif
+        if url.startswith('https://'):
+            try:
+                url_http = 'http://' + url[8:]
+                response = requests.get(url_http, headers=req_headers, timeout=12, verify=False, allow_redirects=True)
+                headers = {k.lower(): v for k, v in response.headers.items()}
+                body = response.text
+                url = url_http
+                ssl_valid = False
+                ssl_issue_detail = "Server hanya melayani protokol HTTP tanpa enkripsi SSL/TLS."
+            except Exception:
+                return {
+                    "score": 0,
+                    "error": "Gagal Scan: Server target tidak merespon atau koneksi ditolak.",
+                    "failed": [],
+                    "passed": []
+                }
+        else:
+            return {
+                "score": 0,
+                "error": "Gagal Scan: Server target tidak merespon atau koneksi ditolak.",
+                "failed": [],
+                "passed": []
+            }
     except requests.exceptions.Timeout:
         return {
             "score": 0,
@@ -122,10 +184,67 @@ def run_scan(url):
     except Exception as e:
         return {"score": 0, "error": f"Gagal Scan: {str(e)}", "failed": [], "passed": []}
 
+    # Evaluasi hasil pemeriksaan Validitas SSL/TLS & Versi Protokol
+    weak_tls_versions = ('SSLv2', 'SSLv3', 'TLSv1', 'TLSv1.0', 'TLSv1.1')
+    if not ssl_valid:
+        score -= 10
+        proto_info = f" (Protokol terdeteksi: {tls_version})" if tls_version else ""
+        failed_filters.append({
+            "name": "SSL/TLS Certificate Invalid",
+            "desc": f"{ssl_issue_detail or 'Sertifikat SSL/TLS tidak valid, kedaluwarsa, atau self-signed.'}{proto_info}",
+            "minus": "-10",
+            "category": "ssl_tls"
+        })
+    elif tls_version in weak_tls_versions:
+        score -= 8
+        failed_filters.append({
+            "name": "Deprecated TLS Protocol",
+            "desc": f"Server masih menggunakan versi protokol enkripsi usang ({tls_version}). Wajib minimal TLSv1.2 atau TLSv1.3.",
+            "minus": "-8",
+            "category": "ssl_tls"
+        })
+    else:
+        passed_filters.append({
+            "name": f"SSL/TLS Valid ({tls_version or 'TLSv1.2+'})",
+            "category": "ssl_tls"
+        })
+
+    # 1C. Cek Redirect HTTP (Port 80) ke HTTPS secara otomatis
+    http_probe_url = f"http://{hostname}/"
+    redirects_to_https = False
+    try:
+        http_res = requests.get(http_probe_url, headers=req_headers, timeout=6, verify=False, allow_redirects=True)
+        if http_res.url.lower().startswith('https://'):
+            redirects_to_https = True
+        else:
+            for hist in http_res.history:
+                loc = hist.headers.get('Location', '') or hist.headers.get('location', '')
+                if loc.lower().startswith('https://'):
+                    redirects_to_https = True
+                    break
+    except Exception:
+        # Jika port 80 ditutup dan situs hanya menerima HTTPS yang sudah valid
+        if ssl_valid and url.lower().startswith('https://'):
+            redirects_to_https = True
+
+    if not redirects_to_https:
+        score -= 5
+        failed_filters.append({
+            "name": "HTTP to HTTPS Redirect Missing",
+            "desc": "Akses melalui protokol HTTP biasa (port 80) tidak dialihkan secara otomatis ke koneksi aman HTTPS.",
+            "minus": "-5",
+            "category": "ssl_tls"
+        })
+    else:
+        passed_filters.append({
+            "name": "HTTP to HTTPS Redirect",
+            "category": "ssl_tls"
+        })
+
     base_url = url if url.endswith('/') else url + '/'
 
     # =========================================================================
-    # TAHAP 2: Analisa Keamanan Header (EXISTING — 4 filter)
+    # TAHAP 2: Analisa Keamanan Header (6 Filter: CSP, HSTS, XFO, XCTO, Referrer, Permissions)
     # =========================================================================
     if 'content-security-policy' not in headers:
         score -= 10
@@ -170,6 +289,88 @@ def run_scan(url):
         })
     else:
         passed_filters.append({"name": "X-Content-Type-Options", "category": "header_security"})
+
+    if 'referrer-policy' not in headers:
+        score -= 3
+        failed_filters.append({
+            "name": "Referrer-Policy",
+            "desc": "Header Referrer-Policy tidak ditemukan. URL dan parameter sensitif berisiko bocor melalui header Referer ke situs eksternal.",
+            "minus": "-3",
+            "category": "header_security"
+        })
+    else:
+        passed_filters.append({"name": "Referrer-Policy", "category": "header_security"})
+
+    if 'permissions-policy' not in headers and 'feature-policy' not in headers:
+        score -= 2
+        failed_filters.append({
+            "name": "Permissions-Policy",
+            "desc": "Header Permissions-Policy tidak ditemukan. Hak akses fitur API browser (kamera, mikrofon, geolokasi) belum dibatasi.",
+            "minus": "-2",
+            "category": "header_security"
+        })
+    else:
+        passed_filters.append({"name": "Permissions-Policy", "category": "header_security"})
+
+    # =========================================================================
+    # TAHAP 2B: Audit Flag Keamanan Cookie (Secure, HttpOnly, SameSite)
+    # =========================================================================
+    raw_cookies = []
+    if response is not None:
+        all_res = list(getattr(response, 'history', [])) + [response]
+        for r_item in all_res:
+            found_in_raw = False
+            if hasattr(r_item, 'raw') and hasattr(r_item.raw, 'headers'):
+                raw_hdr = r_item.raw.headers
+                if hasattr(raw_hdr, 'getlist'):
+                    c_list = raw_hdr.getlist('Set-Cookie')
+                    if c_list:
+                        raw_cookies.extend(c_list)
+                        found_in_raw = True
+                elif hasattr(raw_hdr, 'get_all'):
+                    c_list = raw_hdr.get_all('Set-Cookie')
+                    if c_list:
+                        raw_cookies.extend(c_list)
+                        found_in_raw = True
+            if not found_in_raw and 'set-cookie' in r_item.headers:
+                raw_cookies.append(r_item.headers['set-cookie'])
+
+    insecure_cookies = []
+    seen_cookie_names = set()
+    for cookie_str in raw_cookies:
+        parts = [p.strip() for p in cookie_str.split(';') if p.strip()]
+        if not parts:
+            continue
+        cookie_name = parts[0].split('=', 1)[0].strip()
+        if cookie_name.lower() in seen_cookie_names:
+            continue
+        seen_cookie_names.add(cookie_name.lower())
+
+        attrs_lower = [p.lower() for p in parts[1:]]
+        missing_flags = []
+        if not any(a == 'secure' for a in attrs_lower):
+            missing_flags.append('Secure')
+        if not any(a == 'httponly' for a in attrs_lower):
+            missing_flags.append('HttpOnly')
+        if not any(a.startswith('samesite=') for a in attrs_lower):
+            missing_flags.append('SameSite')
+
+        if missing_flags:
+            insecure_cookies.append(f"{cookie_name} (tanpa {', '.join(missing_flags)})")
+
+    if insecure_cookies:
+        score -= 5
+        failed_filters.append({
+            "name": "Insecure Cookie Flags",
+            "desc": f"Cookie dibuat oleh server tanpa atribut proteksi lengkap: {'; '.join(insecure_cookies[:3])}.",
+            "minus": "-5",
+            "category": "cookie_security"
+        })
+    else:
+        passed_filters.append({
+            "name": "Cookie Security Flags",
+            "category": "cookie_security"
+        })
 
     # =========================================================================
     # TAHAP 3: Analisa File Sensitif Bocor (EXISTING — 1 filter)

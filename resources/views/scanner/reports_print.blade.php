@@ -2,7 +2,9 @@
     $isFullReport = ($reportMode ?? request('mode', 'resmi')) === 'lengkap';
 
     $categoryLabels = [
-        'header_security'      => 'HTTP Security Headers',
+        'ssl_tls'              => 'Validitas SSL/TLS & Redirect HTTPS',
+        'header_security'      => 'HTTP Security Headers Modern',
+        'cookie_security'      => 'Proteksi Flag Cookie',
         'sensitive_leak'       => 'Proteksi File Sensitif',
         'upload_webshell'      => 'File Upload & Web Shell',
         'sqli_sanitization'    => 'SQL Injection & Sanitasi Input',
@@ -14,18 +16,30 @@
     $getRemediation = function (string $name): array {
         if (str_contains($name, 'Sensitive Data')) {
             return ['Kritis', 'Segera kunci atau hapus file sensitif (.env, backup.zip, .git) dari DocumentRoot web dan blokir akses file tersembunyi pada konfigurasi web server.'];
+        } elseif (str_contains($name, 'SSL/TLS Certificate')) {
+            return ['Tinggi', 'Pasang sertifikat SSL/TLS resmi dari Certificate Authority (CA) terpercaya, perbarui sertifikat yang kedaluwarsa, dan pastikan rantai sertifikat lengkap.'];
+        } elseif (str_contains($name, 'Deprecated TLS')) {
+            return ['Sedang', 'Nonaktifkan protokol TLSv1.0/TLSv1.1 pada web server dan hanya izinkan penggunaan protokol modern TLSv1.2 serta TLSv1.3.'];
+        } elseif (str_contains($name, 'HTTP to HTTPS Redirect')) {
+            return ['Sedang', 'Tambahkan konfigurasi HTTP 301 Redirect otomatis dari port 80 (HTTP) menuju koneksi terenkripsi port 443 (HTTPS).'];
         } elseif (str_contains($name, 'Content-Security-Policy')) {
             return ['Tinggi', 'Tambahkan header Content-Security-Policy (CSP) untuk membatasi sumber skrip/aset yang sah guna mencegah serangan Cross-Site Scripting (XSS).'];
         } elseif (str_contains($name, 'Strict-Transport-Security')) {
-            return ['Tinggi', 'Aktifkan header Strict-Transport-Security (HSTS) dengan max-age minimal 31536000 detik agar browser selalu mengunci koneksi ke HTTPS.'];
+            return ['Sedang', 'Aktifkan header Strict-Transport-Security (HSTS) dengan max-age minimal 31536000 detik agar browser selalu mengunci koneksi ke HTTPS.'];
         } elseif (str_contains($name, 'X-Frame-Options')) {
             return ['Sedang', 'Tambahkan header X-Frame-Options: SAMEORIGIN untuk mencegah penyisipan halaman pada iframe eksternal (Clickjacking).'];
         } elseif (str_contains($name, 'X-Content-Type-Options')) {
-            return ['Sedang', 'Tambahkan header X-Content-Type-Options: nosniff agar browser tidak menebak tipe MIME secara otomatis (MIME-sniffing).'];
+            return ['Rendah', 'Tambahkan header X-Content-Type-Options: nosniff agar browser tidak menebak tipe MIME secara otomatis (MIME-sniffing).'];
+        } elseif (str_contains($name, 'Referrer-Policy')) {
+            return ['Rendah', 'Tambahkan header Referrer-Policy: strict-origin-when-cross-origin untuk mencegah kebocoran URL melalui header Referer.'];
+        } elseif (str_contains($name, 'Permissions-Policy')) {
+            return ['Rendah', 'Tambahkan header Permissions-Policy guna membatasi akses fitur API peramban seperti kamera, mikrofon, dan geolokasi.'];
+        } elseif (str_contains($name, 'Cookie Flags')) {
+            return ['Sedang', 'Pastikan setiap cookie yang dibuat server menyertakan atribut proteksi Secure, HttpOnly, dan SameSite=Lax/Strict.'];
         } elseif (str_contains($name, 'Web Shell')) {
             return ['Kritis', 'SEGERA isolasi server, hapus file web shell terdeteksi, lakukan audit integritas menyeluruh pada direktori web, dan periksa access log server.'];
         } elseif (str_contains($name, 'Unvalidated File Upload')) {
-            return ['Tinggi', 'Batasi ekstensi dan tipe MIME pada form maupun backend server, serta simpan file unggahan di luar direktori eksekusi skrip.'];
+            return ['Sedang', 'Batasi ekstensi dan tipe MIME pada form maupun backend server, serta simpan file unggahan di luar direktori eksekusi skrip.'];
         } elseif (str_contains($name, 'SQL Injection')) {
             return ['Kritis', 'Gunakan Prepared Statements / Parameterized Queries pada seluruh akses database dan validasi ketat setiap parameter input URL/form.'];
         } elseif (str_contains($name, 'Brute-Force')) {
